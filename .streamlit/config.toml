@@ -1,0 +1,21 @@
+[theme]
+base = "dark"
+primaryColor = "#00B040"
+backgroundColor = "#0A1628"
+secondaryBackgroundColor = "#111E35"
+textColor = "#E8EDF5"
+borderColor = "#1E3A5F"
+linkColor = "#4ade80"
+baseRadius = "medium"
+linkUnderline = false
+showWidgetBorder = true
+
+font = "'Nunito':https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+headingFont = "'Bebas Neue':https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+headingFontSizes = ["40px", "28px", "22px", "18px", "16px", "14px"]
+headingFontWeights = [400, 400, 400, 400, 400, 400]
+baseFontSize = 15
+
+greenColor = "#00B040"
+yellowColor = "#FFD700"
+redColor = "#e53e3e"
