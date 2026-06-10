@@ -7,8 +7,8 @@ Desenvolvido com **Python + Streamlit + Supabase**.
 
 - Cadastro de participante (nome, e-mail, telefone)
 - Seleção do 1º e 2º colocado de cada um dos **12 grupos** (A–L)
-- 8 melhores terceiros sorteados automaticamente
-- Dados de contato protegidos por RLS no Supabase (email/telefone nunca acessíveis pela chave pública)
+- Mata-mata completo: Quartas → Semifinais → Final → Campeão
+- 8 melhores terceiros passam automaticamente para o mata-mata
 
 ## Rodando Localmente
 
@@ -20,16 +20,15 @@ pip install -r requirements.txt
 
 ### 2. Configurar credenciais
 
-Crie o arquivo `.streamlit/secrets.toml` (ele já está no `.gitignore`):
+Crie o arquivo `.streamlit/secrets.toml` (já está no `.gitignore` — nunca será commitado):
 
 ```toml
-SUPABASE_URL = "https://mqwsumsacxdcrabpvfxa.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xd3N1bXNhY3hkY3JhYnB2ZnhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NjU4NDIsImV4cCI6MjA5NjU0MTg0Mn0.HZm5Y3LksXHywS3VKb_hgPj0WdtpMh8lJMY3O-g0d3Y"
+SUPABASE_URL = "https://SEU_PROJECT_REF.supabase.co"
+SUPABASE_KEY = "sua-anon-key-do-supabase"
 ```
 
-> **Por que a legacy anon JWT key?** A biblioteca `supabase-py` extrai a role `anon`
-> diretamente do JWT. A publishable key (`sb_publishable_...`) não é um JWT e não
-> carrega essa informação, fazendo as políticas RLS falharem.
+> Encontre esses valores em: **Supabase → Project Settings → API**
+> Use a **anon/public key** (começa com `eyJ...`), não a service_role.
 
 ### 3. Rodar o app
 
@@ -58,14 +57,15 @@ Acesse em `http://localhost:8501`
 4. **Adicione os secrets** em **Settings → Secrets**:
 
 ```toml
-SUPABASE_URL = "https://mqwsumsacxdcrabpvfxa.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xd3N1bXNhY3hkY3JhYnB2ZnhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NjU4NDIsImV4cCI6MjA5NjU0MTg0Mn0.HZm5Y3LksXHywS3VKb_hgPj0WdtpMh8lJMY3O-g0d3Y"
+SUPABASE_URL = "https://SEU_PROJECT_REF.supabase.co"
+SUPABASE_KEY = "sua-anon-key-do-supabase"
 ```
 
 5. Clique em **Deploy** ✅
 
-> **Importante:** O arquivo `.streamlit/secrets.toml` está no `.gitignore`
-> e **nunca deve ser commitado**. As credenciais ficam apenas no painel do Streamlit Cloud.
+> **Importante:** As credenciais reais ficam **apenas** no painel do Streamlit Cloud
+> e no `.streamlit/secrets.toml` local (que está no `.gitignore`).
+> Nunca commite chaves reais no repositório.
 
 ---
 
@@ -77,20 +77,23 @@ BOLÃO/
 ├── copa_data.py        # Times e grupos da Copa 2026
 ├── db.py               # Cliente Supabase + operações
 ├── requirements.txt    # Dependências
+├── rodar.ps1           # Atalho para rodar no Windows
 ├── .gitignore
 ├── README.md
 └── .streamlit/
     ├── config.toml     # Tema visual (dark mode, verde Copa)
-    └── secrets.toml    # Credenciais locais (gitignored)
+    └── secrets.toml    # Credenciais locais (gitignored ⚠️)
 ```
 
 ## Banco de Dados (Supabase)
 
-Duas tabelas com RLS configurado:
+Tabela `participantes` com RLS configurado:
 
-| Tabela | Dados | Acesso público |
-|--------|-------|----------------|
-| `participantes` | nome, palpites | ✅ INSERT e SELECT |
-| `contatos` | email, telefone | ✅ INSERT · ❌ SELECT |
-
-Email e telefone **nunca são expostos** via API pública.
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | bigint | PK auto-gerada |
+| `nome` | text | Nome do participante |
+| `email` | text | E-mail de contato |
+| `telefone` | text | Telefone/WhatsApp |
+| `palpites` | jsonb | Todos os palpites (grupos + mata-mata) |
+| `created_at` | timestamptz | Data de registro |
